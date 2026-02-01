@@ -1,5 +1,24 @@
 ## Http-Server-Without-Spring
 
+### 요구사항 확인
+- Java 기반 Socket 서버 : 구현 완료 - `HttpServer`
+- `ServerSocket`을 이용한 소켓 바인딩 : 구현 완료 - `HttpServer`
+- `ExecutorService` 기반 스레드 풀로 요청 처리 : 구현 완료 - `HttpServer`
+- HTTP Request 파싱 : 구현 완료 - `HttpRequestParser`
+    - Request Line (Method / Path / Query)
+    - Header (필요 최소)
+    - Body (POST 1개 이상)
+- URL 라우팅 : 구현 완료 - `Router`
+- Controller 역할 클래스 1개 : 구현 완료 - `MenuController`
+- GET / POST API 1~2개 : 구현 완료 - `GET 메뉴 조회` / `POST 메뉴 추가`
+- 요청 파라미터 파싱 : 구현 완료 - `HttpRequestParser`
+- Validation (null / 타입 / 범위 체크 등) : 구현 완료 - `MenuController`
+- 예외 처리 : 구현 완료
+- HTTP Response 생성 : 구현 완료 - `HttpResponse`
+    - Status Code
+    - Header
+    - Body
+
 ### 1. 구현하면서 가장 귀찮았던 책임 3가지
 (1) HTTP 파싱
 ```
