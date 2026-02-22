@@ -1,6 +1,8 @@
 package router;
 
+import controller.HealthController;
 import controller.MenuController;
+import controller.UserController;
 import http.HttpRequest;
 import http.HttpResponse;
 
@@ -12,7 +14,13 @@ public class Router {
 
 	private final MenuController menuController;
 
+	private final HealthController healthController;
+
+	private final UserController userController;
+
 	public Router() {
+		this.healthController = new HealthController();
+		this.userController = new UserController();
 		this.menuController = new MenuController();
 	}
 
@@ -25,14 +33,24 @@ public class Router {
 
 		System.out.println("[라우팅] " + method + " " + path);
 
-		// @GetMapping
+		// @GetMapping("/api/menu")
 		if ("GET".equals(method) && "/api/menu".equals(path)) {
 			return menuController.getMenuList(request);
 		}
 
-		// PostMapping
+		// @PostMapping("/api/menu")
 		if ("POST".equals(method) && "/api/menu".equals(path)) {
 			return menuController.postMenu(request);
+		}
+
+		// @GetMapping("/health")
+		if ("GET".equals(method) && "/health".equals(path)) {
+			return healthController.getHealth(request);
+		}
+
+		// @GetMapping("/users")
+		if ("GET".equals(method) && "/users".equals(path)) {
+			return userController.getUsers(request);
 		}
 
 		return notFoundPath(path);

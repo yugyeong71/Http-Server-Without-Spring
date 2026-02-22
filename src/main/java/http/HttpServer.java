@@ -33,31 +33,53 @@ public class HttpServer {
 	 * 서버 시작
 	 */
 	public void serverStart() throws IOException {
-		// 1. ServerSocket 포트 바인딩
-		serverSocket = new ServerSocket(port);
+		try {
+			// 1. ServerSocket 포트 바인딩
+			serverSocket = new ServerSocket(port);
 
-		running = true;
+			running = true;
 
-		System.out.println("=== 서버 기동 (" + port + ") ===");
+			System.out.println("=== 서버 기동 (" + port + ") ===");
 
-		// 2. ExecutorService로 10개 스레드 풀 생성
-		System.out.println("=== ThreadPool 생성 (" + ((ThreadPoolExecutor) threadPool).getCorePoolSize() + ") ===");
+			// 2. ExecutorService로 10개 스레드 풀 생성
+			System.out.println("=== ThreadPool 생성 (" + ((ThreadPoolExecutor) threadPool).getCorePoolSize() + ") ===");
 
-		// 3. 클라이언트 연결 대기 (블로킹)
-		while (running) {
-			try {
-				// 4. 클라이언트 연결되면 Socket 객체 획득
-				Socket clientSocket = serverSocket.accept();
-				System.out.println("\n=== 클라이언트 연결 [" + clientSocket.getRemoteSocketAddress() + "] ===");
+			// 3. 클라이언트 연결 대기 (블로킹)
+			while (running) {
+				try {
+					// 4. 클라이언트 연결되면 Socket 객체 획득
+					Socket clientSocket = serverSocket.accept();
+					System.out.println("\n=== 클라이언트 연결 [" + clientSocket.getRemoteSocketAddress() + "] ===");
 
-				// 5. RequestHandler를 스레드 풀에 제출 (비동기 처리)
-				threadPool.submit(new RequestHandler(clientSocket));
+					// 5. RequestHandler를 스레드 풀에 제출 (비동기 처리)
+					threadPool.submit(new RequestHandler(clientSocket));
 
-			} catch (IOException e) {
-				if (running) {
-					System.err.println("=== 클라이언트 연결 실패 : " + e.getMessage() + " ===");
+				} catch (IOException e) {
+					if (running) {
+						System.err.println("=== 클라이언트 연결 실패 : " + e.getMessage() + " ===");
+					}
 				}
 			}
+		} finally { // 무한 대기 방지 + Socket 상태 체크
+			try {
+				if (serverSocket != null && !serverSocket.isClosed()) {
+					serverSocket.close();  // accept() 블로킹 해제
+				}
+			} catch (IOException e) {
+				System.err.println("=== ServerSocket 종료 중 오류 : " + e.getMessage() + " ===");
+			}
+
+			threadPool.shutdown();
+			try {
+				if (!threadPool.awaitTermination(5, TimeUnit.SECONDS)) {
+					threadPool.shutdownNow();
+				}
+			} catch (InterruptedException e) {
+				threadPool.shutdownNow();
+				Thread.currentThread().interrupt();
+			}
+
+			System.out.println("=== 서버 자원 정리 완료 ===");
 		}
 	}
 

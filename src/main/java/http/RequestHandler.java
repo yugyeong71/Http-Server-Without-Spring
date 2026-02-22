@@ -3,6 +3,7 @@ package http;
 import java.net.Socket;
 
 import router.Router;
+import security.SecurityFilterChain;
 
 /**
  * 	[요청 처리 작업]
@@ -12,7 +13,7 @@ public class RequestHandler implements Runnable {
 
 	private final Socket socket;
 
-	private static final Router router = new Router();
+	private static final SecurityFilterChain securityFilterChain = new SecurityFilterChain(new Router());
 
 	public RequestHandler(Socket socket) {
 		this.socket = socket;
@@ -27,7 +28,7 @@ public class RequestHandler implements Runnable {
 			HttpRequest request = HttpRequestParser.parse(socket.getInputStream());
 
 			// 2. Router로 요청 전달 → Controller 실행 → Response 획득
-			HttpResponse response = router.route(request);
+			HttpResponse response = securityFilterChain.execute(request);
 
 			// 3. Socket의 OutputStream으로 HTTP Response 전송
 			response.send(socket.getOutputStream());

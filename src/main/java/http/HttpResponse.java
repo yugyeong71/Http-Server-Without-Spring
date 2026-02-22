@@ -36,6 +36,18 @@ public class HttpResponse {
 		this.body = body;
 	}
 
+	public int getStatusCode() {
+		return statusCode;
+	}
+
+	public String getStatusMessage() {
+		return statusMessage;
+	}
+
+	public String getBody() {
+		return body;
+	}
+
 	/**
 	 * HTTP Response -> OutputStream으로 전송
 	 */
